@@ -8,6 +8,7 @@ class Config(object):
     DEBUG = True
 
 app.config.from_object(Config)
+
 @app.route('/index')
 def index():
     return 'index'
