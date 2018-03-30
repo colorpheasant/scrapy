@@ -3,11 +3,12 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import redis
 from flask_wtf.csrf import CsrfProtect
+from flask_script import  Manager
 import os,base64
 class Config(object):
     """工程配置信息"""
     DEBUG = True
-    # SECRET_KEY = '12345UHSDIFHIO@123'
+    SECRET_KEY = '12345UHSDIFHIO@123'
     SQLALCHEMY_DATABASE_URI ='mysql://root:mysql@127.0.0.1:3306/ihome_07'
     SQLALCHEMY_TRACK_MODIFICATIONS =False
     #配置redis数据:
@@ -22,6 +23,8 @@ db = SQLAlchemy(app)
 redis_store =redis.StrictRedis(host=Config.REDIS_HOST,port=Config.REDIS_PORT)
 
 CsrfProtect(app)
+manager = Manager(app)
+
 @app.route('/index',methods=['GET','POST'])
 def index():
     #测试redis数据哭
@@ -29,4 +32,5 @@ def index():
     return 'index'
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # app.run(debug=True)
+    manager.run()
