@@ -14,3 +14,20 @@ class Config(object):
     SESSION_REDIS =redis.StrictRedis(host=REDIS_HOST,port=REDIS_PORT)
     SESSION_USE_SIGNER = True
     PERMANENT_SESSION_LIFETIME =3600*24
+
+class DevelopmentConfig(Config):
+    SQLALCHEMY_DATABASE_URI = 'mysql://root:mysql@127.0.0.1:3306/ihome_test'
+
+class ProductionConfig(Config):
+    SQLALCHEMY_DATABASE_URI = 'mysql://root:mysql@127.0.0.1:3306/ihome_test'
+
+class UnittestConfig(Config):
+    SQLALCHEMY_DATABASE_URI = 'mysql://root:mysql@127.0.0.1:3306/ihome_test'
+
+#准备工厂
+configs ={
+    'default_config':Config,
+    'development':DevelopmentConfig,
+    'production':ProductionConfig,
+    'unittest':UnittestConfig
+}
