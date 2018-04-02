@@ -9,6 +9,8 @@ from ihome.utils.response_code import RET
 import logging
 import json
 import re
+import random
+from ihome.utils.sms import CCP
 @api.route('/sms_code',methods=['POST'])
 def send_sms_code():
     """发送短信验证码"""
@@ -33,12 +35,23 @@ def send_sms_code():
     if not imageCode_server:
         return jsonify(error=RET.PARAMERR,errmsg="验证码不存在")
 
-    if imageCode_server != imageCode_client:
+    if imageCode_server.lower() != imageCode_client.lower():
         return jsonify(errno=RET.DATAERR,errmsg='验证码输入有误')
 
+    sms_code = '%06d'% random.randint(0,999999)
+    current_app.logger.debug('短信的验证码为:'+ sms_code)
 
+    result=CCP().send_template_sms(mobile,[sms_code,constants.SMS_CODE_REDIS_EXPIRES/60],'1')
+    if result !=1:
+        return jsonify(errno=RET.THIRDERR,errmsg='发送短信验证码失败')
+    try:
+        redis_store.set('Mobile:'+mobile,sms_code,constants.SMS_CODE_REDIS_EXPIRES)
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR,errmsg='存储短信验证码失败')
 
-    return '下一步进入发送短信的逻辑'
+    return jsonify(errno=RET.DBERR,errmsg='存储短信验证码失败')
+
 @api.route('/image_code')
 def get_image_code():
 
