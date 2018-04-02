@@ -1,5 +1,6 @@
 # -*-coding=utf-8 -*-
 import redis
+import logging
 class Config(object):
     """工程配置信息"""
     DEBUG = True
@@ -16,11 +17,11 @@ class Config(object):
     PERMANENT_SESSION_LIFETIME =3600*24
 
 class DevelopmentConfig(Config):
-    SQLALCHEMY_DATABASE_URI = 'mysql://root:mysql@127.0.0.1:3306/ihome_test'
-
+    # SQLALCHEMY_DATABASE_URI = 'mysql://root:mysql@127.0.0.1:3306/ihome_test'
+    LOGGING_LEVEL = logging.DEBUG
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'mysql://root:mysql@127.0.0.1:3306/ihome_test'
-
+    LOGGING_LEVEL = logging.warn
 class UnittestConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'mysql://root:mysql@127.0.0.1:3306/ihome_test'
 
