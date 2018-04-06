@@ -41,16 +41,16 @@ def send_sms_code():
     sms_code = '%06d'% random.randint(0,999999)
     current_app.logger.debug('短信的验证码为:'+ sms_code)
 
-    result=CCP().send_template_sms(mobile,[sms_code,constants.SMS_CODE_REDIS_EXPIRES/60],'1')
-    if result !=1:
-        return jsonify(errno=RET.THIRDERR,errmsg='发送短信验证码失败')
+    # result=CCP().send_template_sms(mobile,[sms_code,constants.SMS_CODE_REDIS_EXPIRES/60],'1')
+    # if result !=1:
+    #     return jsonify(errno=RET.THIRDERR,errmsg='发送短信验证码失败')
     try:
         redis_store.set('Mobile:'+mobile,sms_code,constants.SMS_CODE_REDIS_EXPIRES)
     except Exception as e:
         current_app.logger.error(e)
         return jsonify(errno=RET.DBERR,errmsg='存储短信验证码失败')
 
-    return jsonify(errno=RET.DBERR,errmsg='存储短信验证码失败')
+    return jsonify(errno=RET.OK,errmsg='发送短信验证码成功')
 
 @api.route('/image_code')
 def get_image_code():
