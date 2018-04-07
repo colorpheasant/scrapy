@@ -3,7 +3,7 @@
 
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
-from ihome import constants
+from iHome import constants
 from . import db
 
 
@@ -29,6 +29,7 @@ class User(BaseModel, db.Model):
     houses = db.relationship("House", backref="user")  # 用户发布的房屋
     orders = db.relationship("Order", backref="user")  # 用户下的订单
 
+
     @property
     def password(self):
         raise AttributeError('can not read')
@@ -50,7 +51,6 @@ class User(BaseModel, db.Model):
             'user_id': self.id
         }
         return response_data
-
 
     def auth_to_dict(self):
         """封装用户认证展示的数据"""

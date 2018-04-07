@@ -1,15 +1,27 @@
-# -*-coding=utf-8 -*-
-#实现注册和登陆
+# -*- coding:utf-8 -*-
+# 实现注册和登录
+
+
 from . import api
-from flask import request,jsonify,current_app,session
+from flask import request,jsonify, current_app, session
 import json
-from ihome.utils.response_code import  RET
-from ihome import redis_store,db
-from ihome.models import User
+from iHome.utils.response_code import RET
+from iHome import redis_store, db
+from iHome.models import User
 import re
-from ihome.utils.common import login_required
+from iHome.utils.common import login_required
 
 
+@api.route('/sessions')
+def check_login():
+    """判断用户是否登录
+    0.提示:该接口是用于前端在渲染界面时判断使用的根据不同的登录状态，展示不同的界面
+    """
+
+    user_id = session.get('user_id')
+    name = session.get('name')
+
+    return jsonify(errno=RET.OK, errmsg='OK', data={'user_id':user_id, 'name':name})
 
 
 @api.route('/sessions', methods=['DELETE'])

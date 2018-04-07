@@ -1,40 +1,42 @@
-# -*-coding=utf-8 -*-
+# -*- coding:utf-8 -*-
+# 提供个人中心数据
 
 
 from . import api
 from flask import session, current_app, jsonify, request, g
-from ihome.models import User
-from ihome.utils.response_code import RET
-from ihome import db,constants
-from ihome.utils.image_storage import upload_image
-from ihome.utils.common import login_required
+from iHome.models import User
+from iHome.utils.response_code import RET
+from iHome.utils.image_storage import upload_image
+from iHome import db, constants
+from iHome.utils.common import login_required
 
-@api.route('/sessions')
-def check_login():
-    """判断用户是否登录
-    0.提示:该接口是用于前端在渲染界面时判断使用的根据不同的登录状态，展示不同的界面
-    """
-
-    user_id = session.get('user_id')
-    name = session.get('name')
-
-    return jsonify(errno=RET.OK, errmsg='OK', data={'user_id':user_id, 'name':name})
 
 @api.route('/users/auth', methods=['GET'])
 @login_required
 def get_user_auth():
-    user_id =g.user_id
+    """查询实名认证信息
+    0.判断用户是否登录
+    1.获取user_id,查询user信息
+    2.构造响应数据
+    3.响应结果
+    """
+
+    # 1.获取user_id,查询user信息
+    user_id = g.user_id
     try:
-        user =User.query.get(user_id)
-    except Exception as e :
+        user = User.query.get(user_id)
+    except Exception as e:
         current_app.logger.error(e)
-        return jsonify(errno =RET.DBERR,errmsg="查询用户数据失败")
-    if  not user:
-        return jsonify(errno =RET.NODATA,errmsg="不存在")
+        return jsonify(errno=RET.DBERR, errmsg='查询用户数据失败')
+    if not user:
+        return jsonify(errno=RET.NODATA, errmsg='用户不存在')
 
-    response_data =user.auth_to_dict()
+    # 2.构造响应数据
+    response_data = user.auth_to_dict()
 
-    return jsonify(errno = RET.OK,errmsg = 'OK',data=response_data)
+    # 3.响应结果
+    return jsonify(errno=RET.OK, errmsg='OK', data=response_data)
+
 
 @api.route('/users/auth', methods=['POST'])
 @login_required
@@ -84,7 +86,6 @@ def set_user_auth():
     return jsonify(errno=RET.OK, errmsg='实名认证成功')
 
 
-
 @api.route('/users/name', methods=['PUT'])
 @login_required
 def set_user_name():
@@ -128,8 +129,13 @@ def set_user_name():
         db.session.rollback()
         return jsonify(errno=RET.DBERR, errmsg='存储用户名失败')
 
+    # 修改用户名时，好需要修改session里面的name
+    session['name'] = new_name
+
     # 6.响应结果
     return jsonify(errno=RET.OK, errmsg='修改用户名成功')
+
+
 
 @api.route('/users/avatar', methods=['POST'])
 @login_required
@@ -184,7 +190,6 @@ def upload_avatar():
     # http://oyucyko3w.bkt.clouddn.com/FtEAyyPRhUT8SU3f5DNPeejBjMV5
     avatar_url = constants.QINIU_DOMIN_PREFIX + key
     return jsonify(errno=RET.OK, errmsg='上传头像成功', data=avatar_url)
-
 
 
 @api.route('/users')
